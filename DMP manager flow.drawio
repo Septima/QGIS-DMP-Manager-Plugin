@@ -1,0 +1,79 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="Side-1" id="dzzTLIDG-xzZ6VnZKmM-">
+    <mxGraphModel dx="2066" dy="1202" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-1" value="Login hos DMP&lt;div&gt;(Ny knap i brugerfladen)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#dedede, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="160" y="190" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-2" value="&lt;font style=&quot;color: rgb(255, 255, 255);&quot;&gt;QGIS&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#429b1c, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="120" y="120" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-3" value="&lt;font style=&quot;color: rgb(255, 255, 255);&quot;&gt;DMP&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#3d52f0, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="433.78" y="120" width="286.22" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-4" value="Login via DMP brugerstyring&lt;div&gt;(Åbnes i browser)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#dedede, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="513.78" y="190" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-5" value="DMP OIDC" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#dedede, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="513.78" y="310" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-6" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="aKfy3ADEU9EEypO0pbhq-1" target="aKfy3ADEU9EEypO0pbhq-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="800" y="490" as="sourcePoint" />
+            <mxPoint x="850" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-7" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="aKfy3ADEU9EEypO0pbhq-4" target="aKfy3ADEU9EEypO0pbhq-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="633.78" y="490" as="sourcePoint" />
+            <mxPoint x="683.78" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-8" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="aKfy3ADEU9EEypO0pbhq-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="800" y="490" as="sourcePoint" />
+            <mxPoint x="320" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-9" value="Access-token" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="aKfy3ADEU9EEypO0pbhq-8">
+          <mxGeometry x="0.3111" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-10" value="Oauth2 request dannes" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#dedede, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="160" y="310" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-13" value="DMP Oauth2" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#dedede, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="513.78" y="430" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-14" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="aKfy3ADEU9EEypO0pbhq-10" target="aKfy3ADEU9EEypO0pbhq-13">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="320" y="450" as="sourcePoint" />
+            <mxPoint x="320" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-15" value="Access-token" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="aKfy3ADEU9EEypO0pbhq-14">
+          <mxGeometry x="0.3111" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-20" value="QGIS plugin autentificeret mod DMP arealeditering" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#dedede, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="160" y="430" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-21" value="" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="aKfy3ADEU9EEypO0pbhq-13" target="aKfy3ADEU9EEypO0pbhq-20">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="680" y="450" as="sourcePoint" />
+            <mxPoint x="1000" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="aKfy3ADEU9EEypO0pbhq-22" value="DMP token" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="aKfy3ADEU9EEypO0pbhq-21">
+          <mxGeometry x="0.3111" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,37 @@
+AUTHORITY = "https://log-in.miljoeportal.dk/runtime/oauth2"
+AUTH_URL = f"{AUTHORITY}/authorize.idp"
+TOKEN_URL = f"{AUTHORITY}/token"
+
+CLIENT_ID = "qgisplugin-integration-daiedit"
+REDIRECT_URI = "http://localhost:5001/"
+PORT = 5001
+
+SCOPES = [
+    "openid",
+    "http://www.miljoeportal.dk/roles"
+]
+
+Det forklarer problemet! Serveren returnerer "Internal server error" fordi:
+
+Med PKCE: Serveren accepterer muligvis ikke PKCE som authentication metode
+Uden PKCE og uden client secret: Serveren kan ikke verificere client'en
+Problemet er server-konfigurationen. Client qgisplugin-integration-daiedit skal konfigureres på en af følgende måder:
+
+Option 1: Public client med PKCE (anbefalet til desktop apps)
+
+Client skal være sat op som "public client"
+PKCE skal være aktiveret og påkrævet
+Option 2: Confidential client
+
+Du får en client secret fra administrator
+Secret skal bruges ved token udveksling
+Option 3: Public client uden authentication (mindst sikkert)
+
+Client skal være sat op til at acceptere token requests uden authentication
+Du skal kontakte administratoren for Miljøportalen's DEMO miljø og bede dem om at:
+
+Verificere hvordan client qgisplugin-integration-daiedit er konfigureret
+Enten aktivere PKCE support (anbefalet)
+Eller give dig en client secret
+Bekræfte at redirect URI http://localhost:5001/ er godkendt
+Det er ikke en fejl i din kode - det er en server-side konfiguration der mangler.

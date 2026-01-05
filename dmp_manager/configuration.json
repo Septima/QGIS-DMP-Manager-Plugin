@@ -1,0 +1,162 @@
+{
+    "Access": {
+        "mp_demo": {
+            "Name": "Milj\u00f8portalen-DEMO",
+            "Address": "https://arealeditering.demo.miljoeportal.dk/api",
+            "Headers": {
+                "content-type": "application/vnd.api+json",
+                "accept": "application/vnd.api+json",
+                "Authorization": "Bearer {}"
+            },
+            "clientId": "qgisplugin-integration-daiedittest",
+            "host": "http://localhost",
+            "port": 5001,
+            "redirectUri": "http://localhost:5001/login",
+            "postLogoutRedirectUri": "http://localhost:5001/login",
+            "authority": "https://log-in.test.miljoeportal.dk/runtime/oauth2",
+            "scope": "openid http://www.miljoeportal.dk/roles",
+            "api": "https://arealeditering.demo.miljoeportal.dk/api/",
+            "pipeName": null,
+            "ShowConsole": true
+        },
+        "mp_produktion": {
+            "Name": "Milj\u00f8portalen-PROD",
+            "Address": "https://arealeditering.miljoeportal.dk/api",
+            "Headers": {
+                "content-type": "application/vnd.api+json",
+                "accept": "application/vnd.api+json",
+                "Authorization": "Bearer {}"
+            },
+            "clientId": "qgisplugin-integration-daiedit",
+            "host": "http://localhost",
+            "port": 5001,
+            "redirectUri": "http://localhost:5001/",
+            "postLogoutRedirectUri": "http://localhost:5001/",
+            "authority": "https://log-in.miljoeportal.dk/runtime/oauth2",
+            "scope": "openid http://www.miljoeportal.dk/roles",
+            "api": "https://arealeditering.miljoeportal.dk/api/",
+            "pipeName": null,
+            "ShowConsole": true
+        }
+    },
+    "Access_active": "mp_demo",
+    "Commands": {
+        "temakoder": "/temakoder",
+        "attributter": "/attributter",
+        "temaattributter": "/temaattributter",
+        "objekter": "/objekter",
+        "objektfilter 1": "?intersects={}&filter=equals(temakode.id,'{}')&include=temakode",
+        "objektfilter 3": "?intersects={}&filter=and(equals(temakode.id,'{}'),equals(cvr-kode-id,'{}'))&include=temakode",
+        "objektfilter 2": "?filter=and(equals(temakode.id,'{}'),equals(objekt-id,'{}'))&include=temakode",
+        "temaattributfilter 1": "?include=temakode",
+        "temaattributfilter 1 duer ikke": "?filter=equals(temakode.id,'{}')&include=temakode"
+    },
+    "Templates": {
+        "Objekter": {
+            "data": {
+                "id": null,
+                "type": "objekter",
+                "attributes": {
+                    "temaattributter": {},
+                    "id": null,
+                    "objekt-id": null,
+                    "version-id": null,
+                    "systid-fra": null,
+                    "systid-til": null,
+                    "oprettet": null,
+                    "oprindkode-id": null,
+                    "statuskode-id": null,
+                    "off-kode-id": null,
+                    "cvr-kode-id": null,
+                    "bruger-id": null,
+                    "link": null,
+                    "shape": {}
+                },
+                "relationships": {
+                    "temakode": {
+                        "data": {
+                            "id": null,
+                            "type": null
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "Values": {
+        "Use extent": false,
+        "Use CVR": true,
+        "Preferred layer": "2002 - Beskyttede sten- og jorddiger",
+        "CVR number": 29190623,
+        "Token value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjIzTF9NdlhLWndXUW8xeGdRZkVoWk50Z2tZZyIsIng1dCI6IjIzTF9NdlhLWndXUW8xeGdRZkVoWk50Z2tZZyIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzZjEyNWYyNy0zODIzLTQxZWMtYTZlNC0xNGEyNDE0YWZkYTEiLCJ1aUlkIjoidU5zWURSK3FwY1pyMVVvclo5MVUyZz09IiwiZGs6Z292OnNhbWw6YXR0cmlidXRlOlVuaXF1ZUFjY291bnRLZXkiOiJYcmk6Ly9AREstWFJJKjM0MDcyMTkxLzIwMjUwNDE1MDk0MTU1LjBaL0oxOFNQeU00N0VHbTVCU2lRVXI5b1E9PSIsInVuaXF1ZV9uYW1lIjoiM2YxMjVmMjctMzgyMy00MWVjLWE2ZTQtMTRhMjQxNGFmZGExIiwiZGs6Z292OnNhbWw6YXR0cmlidXRlOkN2ck51bWJlcklkZW50aWZpZXIiOiIzNDA3MjE5MSIsImh0dHA6Ly93d3cubWlsam9lcG9ydGFsLmRrL29yZ2FuaXphdGlvbk51bWJlciI6InNsa3MiLCJodHRwOi8vd3d3Lm1pbGpvZXBvcnRhbC5kay91c2VyUHJpbmNpcGFsTmFtZSI6InNsa3NhZXN0YUBtYnNkay5kayIsImh0dHA6Ly93d3cubWlsam9lcG9ydGFsLmRrL3JvbGVzIjpbIm1pbGpvZV9hcmVhbGluZm9fc2tyaXZfc3RhdF9TTEtTIiwiRG9tYWluIFVzZXJzIiwibWlsam9lX2FyZWFsaW5mb19kaWdlcl9za3Jpdl9zdGF0X2t1YXMiLCIzNDA3MjE5MSJdLCJuYW1lIjoiQm8gVmljdG9yIFRob21zZW4iLCJ0b2tlbl91c2FnZSI6ImFjY2Vzc190b2tlbiIsImp0aSI6IjA3MTRmNzkzLWMzMzgtNDc0Ni05YmY1LTRhZDFkOWJiODcxOCIsInNjb3BlIjpbImh0dHA6Ly93d3cubWlsam9lcG9ydGFsLmRrL3JvbGVzIiwib3BlbmlkIiwib2ZmbGluZV9hY2Nlc3MiXSwiYXVkIjoiaHR0cHM6Ly9sb2ctaW4udGVzdC5taWxqb2Vwb3J0YWwuZGsvcmVzb3VyY2VzIiwiYXpwIjoicWdpc3BsdWdpbi1pbnRlZ3JhdGlvbi1kYWllZGl0dGVzdCIsImlhdCI6MTc0NzMyMDY5NiwibmJmIjoxNzQ3MzIwNjk2LCJleHAiOjE3NDczMjQyOTYsImlzcyI6Imh0dHBzOi8vbG9nLWluLnRlc3QubWlsam9lcG9ydGFsLmRrL3J1bnRpbWUvb2F1dGgyIn0.b8_Ziq--frYkLHSwM_ybCtdQgohimVobOhuvyifQ_CivePOomANfMQUi50tPnUnOfKjg3t85BMYWpbSPtJvy2YMRWFypg2VPju7Zm8vi-HKPdVyRxmNdydeN6-eGt4tcJKYPl9aJ2fdY-OjLKV1zNfvBx29rdHE1vQKOFIQbfsGs6sDiVyYvwRWS1cgN9HS5f5rgDGvPT8xjjfy7IW6_F-IcjmIMJpFd8PuzUJv3V0JUho6Nu7KcBsvhzWgYWebtvnO5wJljEJQkWKndNUkGRAGhjRKjjBUI0oy1YhjhWgC0UgmIP7pOztJ07y4CS0aNzVxFlQT1fErPJK5rfiKFJg",
+        "Token time": "2025-05-15T17:51:37",
+        "Max extent": "POLYGON ((400000 6405000, 900000 6405000, 900000 6045000, 400000 6045000, 400000 6405000))",
+        "EPSG code": 25832,
+        "Log_reference": {},
+        "example_Log_reference": {
+            "uri": "blah.shp",
+            "name": "blah",
+            "type": "ogr"
+        },
+        "Pnt_reference": {
+            "uri": "point?crs=epsg:{}&field=id:integer&field=name:string(20)&index=yes",
+            "name": "elements_pnt_ref",
+            "type": "memory"
+        },
+        "Lin_reference": {
+            "uri": "linestring?crs=epsg:{}&field=id:integer&field=name:string(20)&index=yes",
+            "name": "elements_pnt_ref",
+            "type": "memory"
+        },
+        "Pol_reference": {
+            "uri": "polygon?crs=epsg:{}&field=id:integer&field=name:string(20)&index=yes",
+            "name": "elements_pnt_ref",
+            "type": "memory"
+        }
+    },
+    "Names": {
+        "Global root": "Milj\u00f8portalen",
+        "Administration root": "Administration",
+        "Edited root": "Rettede data",
+        "Log layername": "DMP logtable",
+        "Inserted": "Oprettede elementer",
+        "Deleted": "Slettede elementer",
+        "Modified": "Rettede elementer"
+    },
+    "Selections": {
+        "Inserted": "SELECT cur.* FROM {cur} cur LEFT JOIN {ref} ref on cur.\"{pk}\" = ref.\"{pk}\" WHERE ref.\"{pk}\" IS NULL",
+        "Deleted": "SELECT ref.* FROM {ref} ref LEFT JOIN {cur} cur on ref.\"{pk}\" = cur.\"{pk}\" WHERE cur.\"{pk}\" IS NULL",
+        "Modified_cur": "SELECT cur.* FROM {cur} cur LEFT JOIN {ref} ref on cur.\"{pk}\" = ref.\"{pk}\" WHERE ref.\"{pk}\" IS NOT NULL EXCEPT SELECT ref.* FROM {ref} ref LEFT JOIN {cur} cur on cur.\"{pk}\" = ref.\"{pk}\" WHERE cur.\"{pk}\" IS NOT NULL",
+        "Modified_ref": "SELECT ref.* FROM {ref} ref LEFT JOIN {cur} cur on cur.\"{pk}\" = ref.\"{pk}\" WHERE cur.\"{pk}\" IS NOT NULL EXCEPT SELECT cur.* FROM {cur} cur LEFT JOIN {ref} ref on cur.\"{pk}\" = ref.\"{pk}\" WHERE ref.\"{pk}\" IS NOT NULL"
+    },
+    "rollback": {
+        "Inserted": "DELETE FROM {cur} WHERE \"{pk}\" = {qt}{val}{qt}",
+        "Deleted": "INSERT INTO {cur} SELECT * FROM {ref} WHERE \"{pk}\" = {qt}{val}{qt}",
+        "Modified": "DELETE FROM {cur} WHERE \"{pk}\" = {qt}{val}{qt}; INSERT INTO {cur} SELECT * FROM {ref} WHERE \"{pk}\" = {qt}{val}{qt}"
+    },
+    "commit": {
+        "Inserted": "SELECT * FROM {cur} WHERE \"{pk}\" = {qt}{val}{qt}",
+        "Deleted": "SELECT * FROM {ref} WHERE \"{pk}\" = {qt}{val}{qt}",
+        "Modified": "SELECT * FROM {cur} WHERE \"{pk}\" = {qt}{val}{qt}"
+    },
+    "Data": {
+        "Database_types": {
+            "PostgreSQL": [
+                "postgres",
+                "id",
+                ""
+            ],
+            "GeoPackage": [
+                "ogr",
+                "fid",
+                ""
+            ]
+        },
+        "Database": "PostgreSQL - GIS",
+        "Schema": "dmp",
+        "PKName": "id",
+        "PKQuote": "",
+        "GName": "geom",
+        "RefPrefix": "_ref"
+    }
+}
