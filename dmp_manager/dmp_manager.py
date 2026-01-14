@@ -85,7 +85,8 @@ from .helper import (tr,
                      get_random_string,
                      loadVectorTableFromConnection)
                      
-from .named_pipe import NamedPipe
+# from .named_pipe import NamedPipe
+from .oidc_client import OidcClient
 from json import load, dump, dumps, loads
 
 from .dmp_manager_dockwidget import DMPManagerDockWidget
@@ -135,7 +136,7 @@ class DMPManager:
         self.dockwidget = None
         self.parm = None
         self.attributes = None
-        self.dmpPipe = None
+        self.oidcClient = None
         self.dmpLog = None
 
 
@@ -228,9 +229,10 @@ class DMPManager:
         """Removes the plugin menu item and icon from QGIS GUI."""
 
         try:
-            if self.dmpPipe:
-                self.dmpPipe.stop()
-                QTest.qWait(500)
+            # Old Named Pipe cleanup - no longer needed
+            # if self.dmpPipe:
+            #     self.dmpPipe.stop()
+            QTest.qWait(500)
         except:
             pass
             
@@ -296,25 +298,12 @@ class DMPManager:
             spd = self.parm["Data"]
             spa = self.parm["Access"][self.parm["Access_active"]]
 
-            if self.dmpPipe == None: 
-                progName = os.path.join(self.plugin_dir,'login_app','DMPLogin.exe')
-
-                if spa["pipeName"]:
-                    pipeName = spa["pipeName"]
-                else:
-                    pipeName = get_random_string(24)
+            if self.oidcClient == None:
+                # Create OIDC client using configuration name
+                config_name = self.parm["Access_active"]  # e.g., "mp_demo" or "mp_produktion"
+                config_file = os.path.join(self.plugin_dir, 'configuration.json')
                 
-                self.dmpPipe = NamedPipe(progName,
-                                         spa["clientId"],
-                                         spa["host"],
-                                         spa["port"],
-                                         spa["redirectUri"],
-                                         spa["postLogoutRedirectUri"],
-                                         spa["authority"],
-                                         spa["scope"],
-                                         spa["api"],
-                                         pipeName,
-                                         spa["ShowConsole"])
+                self.oidcClient = OidcClient(config_name=config_name, config_file=config_file)
 
 
     def tvCompareOpenMenu(self, position):
@@ -1120,12 +1109,18 @@ class DMPManager:
         """HTTP request to generate access ticket and token for DMP"""
 
         sd = self.dockwidget
-        res = self.dmpPipe.login()
-        if res == '':
-            sd.leToken.setText(self.dmpPipe.accessToken)
-            sd.dtTimeout.setDateTime(self.dmpPipe.expirationTime)
-        else:
-            messW(tr('Login error: {}').format(res))
+        
+        # Define callback to handle token when received
+        def on_token_received(token_data):
+            sd.leToken.setText(token_data['token'])
+            sd.dtTimeout.setDateTime(QDateTime(token_data['expiry']))
+            messI(tr('Login successful'))
+        
+        # Start login process (opens browser, returns immediately)
+        success = self.oidcClient.login(callback=on_token_received)
+        
+        if not success:
+            messW(tr('Failed to start login process'))
 
 #    def pbLogoutClicked(self):
 #        """HTTP request to generate access ticket and token for DMP"""
@@ -1205,14 +1200,21 @@ class DMPManager:
 
         sd = self.dockwidget
 
-        res = self.dmpPipe.refresh()
-
-        if sd.dtTimeout.dateTime() != self.dmpPipe.expirationTime: messI(tr('Access token and expiration time updated')) 
-
-        sd.leToken.setText(self.dmpPipe.accessToken)
-        sd.dtTimeout.setDateTime(self.dmpPipe.expirationTime)
-
-        return True
+        result = self.oidcClient.refresh_token()
+        
+        if result:
+            old_time = sd.dtTimeout.dateTime()
+            new_time = QDateTime(result['expiry'])
+            
+            if old_time != new_time:
+                messI(tr('Access token and expiration time updated'))
+            
+            sd.leToken.setText(result['token'])
+            sd.dtTimeout.setDateTime(new_time)
+            return True
+        else:
+            messW(tr('Token refresh failed'))
+            return False
 
 
     def loadcbLayerCheck(self):

@@ -10,20 +10,17 @@ import secrets
 # Miljøportalen DEMO konfiguration
 AUTHORITY = "https://log-in.test.miljoeportal.dk/runtime/oauth2"
 AUTH_URL = f"{AUTHORITY}/authorize.idp"
-TOKEN_URL = f"{AUTHORITY}/token.idp"  # VIGTIGT: .idp i slutningen!
+TOKEN_URL = f"{AUTHORITY}/token"
 
 CLIENT_ID = "qgisplugin-integration-daiedittest"
-CLIENT_SECRET = None  # Sæt til din client secret hvis du har en, ellers None
-# VIGTIG NOTE: Hvis serveren kræver en client_secret, skal den indsættes ovenfor!
-# Eksempel: CLIENT_SECRET = "din_hemmelige_nøgle_her"
-REDIRECT_URI = "http://localhost:5001/login"  # MÅ matche server konfiguration!
+CLIENT_SECRET = None  # Sæt til din client secret hvis du har en
+REDIRECT_URI = "http://localhost:5001/"
 PORT = 5001
 
 SCOPES = [
     "openid",
     "http://www.miljoeportal.dk/roles"
 ]
-
 
 
 class RedirectListener(QTcpServer):
@@ -85,7 +82,9 @@ class OidcPoC(QObject):
             QgsMessageLog.logMessage(f"FEJL: Kunne ikke lytte på port {PORT}", "OIDC")
 
     def start(self):
-        print("\n=== STARTER OIDC LOGIN (UDEN PKCE) ===")
+        print("\n=== STARTER OIDC LOGIN (DEBUG VERSION) ===")
+        print(f"Client ID: {CLIENT_ID}")
+        print(f"Client Secret: {'[SAT]' if CLIENT_SECRET else '[IKKE SAT]'}")
         QgsMessageLog.logMessage("Starter OIDC login", "OIDC")
         
         # Start listener
@@ -108,14 +107,10 @@ class OidcPoC(QObject):
         QDesktopServices.openUrl(QUrl(auth_url))
         
     def exchange_code_for_token(self, code):
-        print("\n=== UDVEKSLER CODE TIL TOKEN (UDEN PKCE) ===")
-        print("⚠️  VIGTIGT: Authorization codes kan kun bruges ÉN gang!")
-        print("   Hvis du ser 'Internal server error', kan det være fordi:")
-        print("   1. Code'n allerede er brugt")
-        print("   2. Client ID konfigurationen er forkert")
-        print("   3. Redirect URI matcher ikke")
+        print("\n=== UDVEKSLER CODE TIL TOKEN ===")
         QgsMessageLog.logMessage("Udveksler authorization code til access token...", "OIDC")
         
+        # Byg request data
         data = {
             'grant_type': 'authorization_code',
             'code': code,
@@ -123,81 +118,84 @@ class OidcPoC(QObject):
             'client_id': CLIENT_ID
         }
         
-        # Tilføj client_secret hvis den findes
+        # Tilføj client_secret hvis den er sat
         if CLIENT_SECRET:
             data['client_secret'] = CLIENT_SECRET
-            print("⚠️  Sender client_secret med requestet")
+            print("Client secret inkluderet i request")
         else:
-            print("ℹ️  Ingen client_secret (public client mode)")
+            print("INGEN client secret - sender som public client")
         
-        print(f"Token URL: {TOKEN_URL}")
-        print(f"Request data: {data}")
+        print(f"\nToken URL: {TOKEN_URL}")
         print(f"Authorization code længde: {len(code)} tegn")
         
-        # Prøv med explicit headers
+        # Headers
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json'
         }
         
+        # Test 1: Standard POST med form data
+        self._try_token_exchange("Standard POST (form-urlencoded)", TOKEN_URL, data, headers)
+        
+        # Test 2: Prøv med Basic Auth hvis vi har client secret
+        if CLIENT_SECRET:
+            print("\n\n=== PRØVER MED BASIC AUTH ===")
+            import base64
+            auth_string = f"{CLIENT_ID}:{CLIENT_SECRET}"
+            auth_bytes = base64.b64encode(auth_string.encode('utf-8')).decode('utf-8')
+            
+            headers_basic = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json',
+                'Authorization': f'Basic {auth_bytes}'
+            }
+            
+            data_basic = {
+                'grant_type': 'authorization_code',
+                'code': code,
+                'redirect_uri': REDIRECT_URI
+            }
+            
+            self._try_token_exchange("Basic Auth", TOKEN_URL, data_basic, headers_basic)
+    
+    def _try_token_exchange(self, method_name, url, data, headers):
+        print(f"\n=== FORSØG: {method_name} ===")
+        
         try:
-            print("\nSender POST request...")
-            print(f"Headers: {headers}")
-            response = requests.post(TOKEN_URL, data=data, headers=headers)
+            response = requests.post(url, data=data, headers=headers)
             
-            print(f"\nResponse status: {response.status_code}")
-            print(f"Response headers:")
-            for key, value in response.headers.items():
-                print(f"  {key}: {value}")
-            print(f"\nResponse Content-Type: {response.headers.get('Content-Type')}")
+            print(f"Response status: {response.status_code}")
+            print(f"Response Content-Type: {response.headers.get('Content-Type')}")
             
-            response.raise_for_status()
-            
-            # Tjek om responset er JSON
-            content_type = response.headers.get('Content-Type', '')
-            if 'application/json' not in content_type:
-                error_msg = f"Server returnerede ikke JSON (Content-Type: {content_type})"
-                print(f"\n✗ FEJL: {error_msg}")
-                print(f"\n=== FULD RESPONSE BODY ===")
-                print(response.text)
-                print("=== SLUT RESPONSE BODY ===\n")
-                QgsMessageLog.logMessage(error_msg, "OIDC")
-                
-                if 'Internal server error' in response.text:
-                    print("\n" + "="*60)
-                    print("⚠️  SERVER FEJL DIAGNOSE:")
-                    print("="*60)
-                    print("Mulige årsager:")
-                    print("1. Authorization code allerede brugt (codes kan kun bruges én gang!)")
-                    print("2. Client ID ikke konfigureret korrekt på serveren")
-                    print("3. Redirect URI matcher ikke server konfigurationen")
-                    print("4. Client mangler rettigheder til token endpoint")
-                    print("\nAnbefalinger:")
-                    print("- Log ind igen for at få en ny code")
-                    print("- Kontakt serveradministrator for at verificere client konfiguration")
-                    print("- Tjek om client_secret er påkrævet")
-                    print("="*60)
-                return
-            
-            token_data = response.json()
-            access_token = token_data.get('access_token')
-            
-            QgsMessageLog.logMessage("Login OK - token modtaget", "OIDC")
-            print("\n✓ SUCCESS!")
-            print("\nACCESS TOKEN:")
-            print(access_token)
-            print("\nFULL TOKEN DATA:")
-            print(token_data)
-            
-        except requests.exceptions.HTTPError as e:
-            error_msg = f"HTTP fejl {response.status_code}: {response.text[:500]}"
-            QgsMessageLog.logMessage(f"Fejl ved token udveksling: {error_msg}", "OIDC")
-            print(f"\n✗ HTTP ERROR: {error_msg}")
+            # Tjek om det var success
+            if response.status_code == 200:
+                content_type = response.headers.get('Content-Type', '')
+                if 'application/json' in content_type:
+                    token_data = response.json()
+                    print("\n✓✓✓ SUCCESS! ✓✓✓")
+                    print(f"\nACCESS TOKEN:")
+                    print(token_data.get('access_token'))
+                    print(f"\nFULL TOKEN DATA:")
+                    print(token_data)
+                    return True
+                else:
+                    print(f"✗ Server returnerede text/html i stedet for JSON")
+                    if "Internal server error" in response.text:
+                        print("  → Internal server error detekteret")
+            else:
+                print(f"✗ HTTP fejl {response.status_code}")
+                try:
+                    error_data = response.json()
+                    print(f"  Error: {error_data}")
+                except:
+                    print(f"  Response preview: {response.text[:200]}")
+                    
         except Exception as e:
-            QgsMessageLog.logMessage(f"Fejl ved token udveksling: {e}", "OIDC")
-            print(f"\n✗ ERROR: {e}")
+            print(f"✗ Exception: {e}")
             import traceback
             traceback.print_exc()
+        
+        return False
 
 
 # Luk gammel listener hvis den eksisterer
@@ -207,6 +205,13 @@ try:
         print("Lukkede gammel listener")
 except:
     pass
+
+print("\n" + "="*80)
+print("OIDC DEBUG SCRIPT")
+print("="*80)
+print("\nDette script tester forskellige authentication metoder.")
+print("Hvis du har en client secret, sæt CLIENT_SECRET variablen i toppen af filen.")
+print("="*80 + "\n")
 
 poc = OidcPoC()
 poc.start()
