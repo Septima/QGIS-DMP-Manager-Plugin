@@ -1,6 +1,12 @@
 """
-OIDC/OAuth2 Client for QGIS Plugins
-Handles authentication with miljoeportalen using OAuth2 with PKCE
+/***************************************************************************
+OIDC/OAuth2 Client for DMP Manager QGIS Plugin
+Handles authentication with miljoeportalen using OAuth2 with PKCE.
+
+        copyright            : (C) 2026 by Morten Fuglsang, Septima
+        email                : morten.fuglsang@septima.dk
+ ***************************************************************************/
+
 """
 
 import json

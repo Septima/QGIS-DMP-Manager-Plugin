@@ -1065,8 +1065,11 @@ class DMPManager:
         #sd.leCVRNo.setText(str(spv["CVR number"]))
         sd.lePrefLayer.setText(spv["Preferred layer"])
         sd.chbMapExtent.setChecked(spv["Use extent"])
-        sd.leToken.setText(spv["Token value"])
-        sd.dtTimeout.setDateTime(QDateTime().fromString(spv["Token time"], Qt.ISODate))
+        # Token fields start empty - user must login each session
+        sd.leToken.setText("")
+        # Clear timeout field - show special text when empty
+        sd.dtTimeout.setSpecialValueText("Not logged in")
+        sd.dtTimeout.setDateTime(sd.dtTimeout.minimumDateTime())
         sd.lePkName.setText(spd["PKName"])
         sd.lePkQuote.setText(spd["PKQuote"])
         sd.lMiljoe.setText(spa["Name"])
@@ -1088,8 +1091,7 @@ class DMPManager:
         spv["CVR number"] = int(sd.cbCVRNo.itemData(sd.cbCVRNo.currentIndex()))
         spv["Preferred layer"] = sd.lePrefLayer.text()
         spv["Use extent"] = sd.chbMapExtent.isChecked()
-        spv["Token value"] = sd.leToken.text()
-        spv["Token time"] = sd.dtTimeout.dateTime().toString(Qt.ISODate)
+        # Token values are NOT saved - user must login each session
 
         spd["Database"] = sd.cbDatabase.currentText()
         spd["Schema"] = sd.cbSchema.currentText()
@@ -1109,18 +1111,34 @@ class DMPManager:
         """HTTP request to generate access ticket and token for DMP"""
 
         sd = self.dockwidget
+        spa = self.parm["Access"][self.parm["Access_active"]]
+        
+        logI(tr('Starting login process for environment: {}').format(spa["Name"]))
+        logI(tr('Authority: {}').format(spa["authority"]))
         
         # Define callback to handle token when received
         def on_token_received(token_data):
+            logI(tr('Access token received successfully'))
+            logI(tr('Token expires at: {}').format(token_data['expiry'].strftime('%Y-%m-%d %H:%M:%S')))
+            
+            # Update token field with access token
             sd.leToken.setText(token_data['token'])
-            sd.dtTimeout.setDateTime(QDateTime(token_data['expiry']))
-            messI(tr('Login successful'))
+            
+            # Convert Python datetime to QDateTime and update timeout field
+            expiry_dt = token_data['expiry']
+            qdt = QDateTime()
+            qdt.setDate(expiry_dt.date())
+            qdt.setTime(expiry_dt.time())
+            sd.dtTimeout.setDateTime(qdt)
         
         # Start login process (opens browser, returns immediately)
+        logI(tr('Opening browser for authentication...'))
         success = self.oidcClient.login(callback=on_token_received)
         
         if not success:
-            messW(tr('Failed to start login process'))
+            logC(tr('Failed to start login process - could not start redirect listener'))
+        else:
+            logI(tr('Waiting for authentication in browser...'))
 
 #    def pbLogoutClicked(self):
 #        """HTTP request to generate access ticket and token for DMP"""
@@ -1196,25 +1214,34 @@ class DMPManager:
                 messC(tr('Error {} for download of {}').format(status, 'temaattributter'))
 
     def checkToken(self):
-        """Check if token still is valid (not to old)"""
+        """Check if token still is valid (not to old) and refresh if necessary"""
 
         sd = self.dockwidget
 
-        result = self.oidcClient.refresh_token()
-        
-        if result:
-            old_time = sd.dtTimeout.dateTime()
-            new_time = QDateTime(result['expiry'])
+        # Check if token is expired and refresh only if needed
+        if self.oidcClient.is_token_expired():
+            logI(tr('Access token has expired, attempting to refresh...'))
+            result = self.oidcClient.refresh_token()
             
-            if old_time != new_time:
-                messI(tr('Access token and expiration time updated'))
-            
-            sd.leToken.setText(result['token'])
-            sd.dtTimeout.setDateTime(new_time)
-            return True
+            if result:
+                # Convert Python datetime to QDateTime
+                expiry_dt = result['expiry']
+                qdt = QDateTime()
+                qdt.setDate(expiry_dt.date())
+                qdt.setTime(expiry_dt.time())
+                
+                logI(tr('Access token refreshed successfully, new expiry: {}').format(expiry_dt.strftime('%Y-%m-%d %H:%M:%S')))
+                
+                sd.leToken.setText(result['token'])
+                sd.dtTimeout.setDateTime(qdt)
+                return True
+            else:
+                logC(tr('Token refresh failed - refresh token may be invalid or expired'))
+                logW(tr('Please login again using the Request Token button'))
+                return False
         else:
-            messW(tr('Token refresh failed'))
-            return False
+            # Token is still valid
+            return True
 
 
     def loadcbLayerCheck(self):
@@ -1445,15 +1472,33 @@ class DMPManager:
 
             if self.parm["Access_active"] != sd.cbEnvironment.itemData(index):
 
-                buttonReply = QMessageBox.question(None, tr('Change data environment...'), tr('You have chosen to change the data environment from:\n\n "{}" to "{}".\n\nIf you proceed, the QGIS application will be ended and you have to wait up to one hour for the DMP logon to timeout before working in the new data environment.\n\nProceed ?').format(self.parm["Access_active"], sd.cbEnvironment.itemData(index)), QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-                if buttonReply == QMessageBox.Yes:
-                    messI(tr('DMP data environment will be changed from "{}" to "{}"').format(self.parm["Access_active"], sd.cbEnvironment.itemData(index)))
-                    self.parm["Access_active"] = sd.cbEnvironment.itemData(index)
-                    self.pbSaveClicked()
-                    self.iface.actionExit().trigger()
-
-                else:
-                    messI(tr('DMP data environment will not be changed'))
+                old_env = self.parm["Access_active"]
+                new_env = sd.cbEnvironment.itemData(index)
+                
+                messI(tr('DMP data environment changed from "{}" to "{}". Please login again.').format(old_env, new_env))
+                
+                # Update active environment
+                self.parm["Access_active"] = new_env
+                
+                # Update environment label
+                spa = self.parm["Access"][self.parm["Access_active"]]
+                sd.lMiljoe.setText(spa["Name"])
+                
+                # Clear token and timeout - user must login again
+                sd.leToken.setText("")
+                sd.dtTimeout.setSpecialValueText("Not logged in")
+                sd.dtTimeout.setDateTime(sd.dtTimeout.minimumDateTime())
+                
+                # Recreate OIDC client with new configuration
+                config_name = self.parm["Access_active"]
+                config_file = os.path.join(self.plugin_dir, 'configuration.json')
+                self.oidcClient = OidcClient(config_name=config_name, config_file=config_file)
+                
+                # Save configuration
+                self.pbSaveClicked()
+                
+                # Switch to Fetch tab (index 0)
+                sd.twMain.setCurrentIndex(0)
 
     def cbDatabaseCurrentIndexChanged (self, index):
 

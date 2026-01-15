@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>336</width>
-    <height>534</height>
+    <width>408</width>
+    <height>656</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,6 +31,20 @@
            <string>Tokens </string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QPushButton" name="pbReqToken">
+             <property name="text">
+              <string>Login to DMP </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Login åbner i en webbrowser</string>
+             </property>
+            </widget>
+           </item>
            <item>
             <layout class="QFormLayout" name="formLayout">
              <item row="0" column="0">
@@ -60,15 +74,7 @@
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <item>
-              <widget class="QPushButton" name="pbReqToken">
-               <property name="text">
-                <string>Login to DMP </string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <layout class="QHBoxLayout" name="horizontalLayout_5"/>
            </item>
           </layout>
          </widget>
